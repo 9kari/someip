@@ -6,7 +6,7 @@ import os
 # URL of the Kafka Improvement Proposals page
 URL = "https://cwiki.apache.org/confluence/display/kafka/kafka+improvement+proposals"
 
-# Output directory for HTML files
+# Output directory for KIP folders
 OUTPUT_DIR = "kip_redirects"
 
 # Create output directory if it doesn't exist
@@ -36,10 +36,12 @@ for a in soup.find_all("a", href=True):
             href = "https://cwiki.apache.org" + href
         kip_links[kip_number] = href
 
-# Write HTML files
+# Write index.html in a directory for each KIP
 for kip_number, kip_url in kip_links.items():
-    filename = f"KIP-{kip_number}.html"
-    filepath = os.path.join(OUTPUT_DIR, filename)
+    dir_name = f"KIP-{kip_number}"
+    dir_path = os.path.join(OUTPUT_DIR, dir_name)
+    os.makedirs(dir_path, exist_ok=True)
+    index_filepath = os.path.join(dir_path, "index.html")
     html_content = f"""<!DOCTYPE html>
 <html>
   <head>
@@ -51,7 +53,7 @@ for kip_number, kip_url in kip_links.items():
   </body>
 </html>
 """
-    with open(filepath, "w", encoding="utf-8") as f:
+    with open(index_filepath, "w", encoding="utf-8") as f:
         f.write(html_content)
 
-print(f"Generated {len(kip_links)} KIP redirect HTML files in '{OUTPUT_DIR}' directory.")
+print(f"Generated {len(kip_links)} KIP redirect folders (each with index.html) in '{OUTPUT_DIR}' directory.")
