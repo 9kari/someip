@@ -9,10 +9,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Copy script to container
-COPY parse_kip_links.py .
+COPY parse_improvement_proposals.py .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir beautifulsoup4 requests
 
-# Set entrypoint
-ENTRYPOINT ["python", "parse_kip_links.py"]
+# Set entrypoint to python but allow args to be passed
+ENTRYPOINT ["python", "/app/parse_improvement_proposals.py"]
