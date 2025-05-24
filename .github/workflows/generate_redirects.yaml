@@ -18,4 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Generate redirect files
-      run: docker run --rm -v ${{ github.workspace }}:/output/ ghcr.io/surdy/proposal-parser:0.0.3 --url ${{ inputs.url }} --output-dir ${{ inputs.output_dir }} --prefix ${{inputs.prefix}}
+      run: docker run --rm -v ${{ github.workspace }}:/output/ ghcr.io/surdy/proposal-parser:0.0.3 --url ${{ inputs.url }} --output-dir /output/${{ inputs.output_dir }} --prefix ${{inputs.prefix}}
+    - name: Deploy assets to Cloudflare
+      uses: cloudflare/wrangler-action@v3
+      with:
+        apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        command: pages deploy ${{ inputs.output_dir }} --project-name=someip-xyz
+    
