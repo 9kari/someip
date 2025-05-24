@@ -9,12 +9,12 @@ jobs:
       secrets: inherit
       with: 
         url: https://cwiki.apache.org/confluence/display/kafka/kafka+improvement+proposals
-        output_dir: kip
+        output_dir: someip-xyz
         prefix: KIP
     generate-flip-redirects:
       uses: ./.github/workflows/generate_redirects.yaml
       secrets: inherit
       with: 
         url: https://cwiki.apache.org/confluence/display/FLINK/Flink+Improvement+Proposals
-        output_dir: flip
+        output_dir: someip-xyz
         prefix: FLIP
