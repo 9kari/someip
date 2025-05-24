@@ -1,0 +1,21 @@
+name: Generate Redirects
+
+on:
+  workflow_call:
+    inputs:
+      url:
+        required: true
+        type: string
+      output_dir:
+        required: true
+        type: string
+      prefix:
+        required: true
+        type: string
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Generate redirect files
+      run: docker run --rm -v ${{ github.workspace }}:/output/ ghcr.io/surdy/proposal-parser:0.0.3 --url ${{ inputs.url }} --output-dir ${{ inputs.output_dir }} --prefix ${{inputs.prefix}}
