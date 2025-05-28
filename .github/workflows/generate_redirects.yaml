@@ -1,45 +1,48 @@
 name: Generate Redirects
-
 on:
-  workflow_call:
-    inputs:
-      url:
-        required: true
-        type: string
-      output_dir:
-        required: true
-        type: string
-      prefix:
-        required: true
-        type: string
-    outputs:
-      files_changed:
-       description: "If files have changed"
-       value: ${{ jobs.generate.outputs.files_changed }}
-
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'
 jobs:
-  generate:
-    permissions:
-      contents: write
-    runs-on: ubuntu-latest
-    outputs:
-      files_changed: ${{ steps.check_for_changes.outputs.files_changed }}
-    steps:
-    - name: Checkout Repo
-      uses: actions/checkout@v4
-    - name: Generate redirect files
-      run: docker run --rm -v ${{ github.workspace }}:/output/ ghcr.io/surdy/proposal-parser:0.0.3 --url ${{ inputs.url }} --output-dir /output/${{ inputs.output_dir }} --prefix ${{inputs.prefix}} 
-    - name: Check if any files have changed and commit them
-      id: check_for_changes
-      run: |
-        git config --global user.name "${{ github.actor }}"
-        git config --global user.email  "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
-        git add ${{ inputs.output_dir }}
-        if ! git diff --staged --quiet
-        then
-          echo "files_changed=true" >> $GITHUB_OUTPUT
-          git commit -m "Update ${{inputs.prefix}} redirects"
-          git push
-        else
-          echo "files_changed=false" >> $GITHUB_OUTPUT
-        fi
+    generate-redirects:
+      permissions:
+        contents: write
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout Repo
+          uses: actions/checkout@v4
+        - name: Generate KIP redirect files
+          run: |
+            docker run --rm -v ${{ github.workspace }}:/output/ ghcr.io/surdy/proposal-parser:0.0.3 \
+            --url https://cwiki.apache.org/confluence/display/kafka/kafka+improvement+proposals \
+            --output-dir /output/someip-xyz --prefix KIP
+        - name: Generate FLIP redirect files
+          run: |
+            docker run --rm -v ${{ github.workspace }}:/output/ ghcr.io/surdy/proposal-parser:0.0.3 \
+            --url https://cwiki.apache.org/confluence/display/FLINK/Flink+Improvement+Proposals \
+            --output-dir /output/someip-xyz --prefix FLIP 
+        - name: Check if any files have changed and commit them
+          run: |
+            git config --global user.name "${{ github.actor }}"
+            git config --global user.email  "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+            git add someip-xyz
+            if ! git diff --staged --quiet
+            then
+              echo "files_changed=true" >> $GITHUB_OUTPUT
+              git commit -m "Update redirects"
+              git push
+            else
+              echo "files_changed=false" >> $GITHUB_OUTPUT
+            fi
+
+#    upload-artifacts:
+#      needs: [ generate-kip-redirects, generate-flip-redirects ]
+#      if: needs.generate-kip-redirects.outputs.files_changed == 'true' || needs.generate-flip-redirects.outputs.files_changed == 'true'
+#      runs-on: ubuntu-latest
+#      steps:
+#      - name: Deploy assets to Cloudflare
+#        uses: cloudflare/wrangler-action@v3
+#        with:
+#          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+#          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+#          command: pages deploy someip-xyz --project-name=someip-xyz
