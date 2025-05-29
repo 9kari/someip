@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import re
 import os
 import argparse
+import shutil
 
 def main():
     parser = argparse.ArgumentParser(
@@ -72,9 +73,14 @@ def main():
     # Write index.html in a directory for each proposal
     for proposal_number, proposal_url in proposal_links.items():
         dir_name = f"{proposal_prefix}-{proposal_number}"
+        # Also create file with proposal prefix in lower case
+        lc_dir_name = f"{proposal_prefix}-{proposal_number}".lower()
         dir_path = os.path.join(output_dir, dir_name)
+        lc_dir_path = os.path.join(output_dir, lc_dir_name)
         os.makedirs(dir_path, exist_ok=True)
+        os.makedirs(lc_dir_path, exist_ok=True)
         index_filepath = os.path.join(dir_path, "index.html")
+        lc_index_filepath = os.path.join(lc_dir_path, "index.html")
         html_content = f"""<!DOCTYPE html>
 <html>
   <head>
@@ -85,6 +91,7 @@ def main():
 """
         with open(index_filepath, "w", encoding="utf-8") as f:
             f.write(html_content)
+        shutil.copyfile(index_filepath, lc_index_filepath)
 
     print(f"Generated {len(proposal_links)} {proposal_prefix} redirect folders (each with index.html) in '{output_dir}' directory.")
 
