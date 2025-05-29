@@ -35,12 +35,16 @@ def main():
     # Infer prefix if not provided
     if args.prefix:
         proposal_prefix = args.prefix
+        project= ""
     elif "kafka" in url.lower():
         proposal_prefix = "KIP"
+        project="kafka"
     elif "flink" in url.lower():
         proposal_prefix = "FLIP"
+        project="flink"
     else:
         proposal_prefix = "IP"  # generic fallback
+        project= ""
 
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
@@ -93,6 +97,18 @@ def main():
         os.makedirs(lc_dir_path, exist_ok=True)
         lc_index_filepath = os.path.join(lc_dir_path, "index.html")
         shutil.copyfile(index_filepath, lc_index_filepath)
+
+        # Also create a redirect file with just the proposal number
+        # this is for use with the <project-name> subdomain
+        if project:
+            # Add project prefix to the output directory
+            prj_basename = f"{project}-{os.path.basename(output_dir)}"
+            prj_output_dir = os.path.join(os.path.dirname(output_dir), prj_basename)
+            num_dir_name = f"{proposal_number}"
+            prj_dir_path = os.path.join(prj_output_dir, num_dir_name)
+            os.makedirs(prj_dir_path, exist_ok=True)
+            prj_index_filepath = os.path.join(prj_dir_path, "index.html")
+            shutil.copyfile(index_filepath, prj_index_filepath)
 
     print(f"Generated {len(proposal_links)} {proposal_prefix} redirect folders (each with index.html) in '{output_dir}' directory.")
 
