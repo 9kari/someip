@@ -81,9 +81,6 @@ def main():
     <meta http-equiv="refresh" content="0; url={proposal_url}" />
     <title>Redirecting to {proposal_prefix}-{proposal_number}</title>
   </head>
-  <body>
-    <p>Redirecting to <a href="{proposal_url}">{proposal_url}</a></p>
-  </body>
 </html>
 """
         with open(index_filepath, "w", encoding="utf-8") as f:
