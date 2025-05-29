@@ -1,0 +1,25 @@
+name: Upload to pages
+
+on:
+  workflow_call:
+    inputs:
+      project:
+        required: true
+        type: string
+      assets_dir:
+        required: true
+        type: string
+jobs:
+    upload-artifacts:
+      runs-on: ubuntu-latest
+      steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Deploy assets to Cloudflare
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy ${{ inputs.assets_dir }}  --project-name=${{ inputs.project }}

@@ -8,6 +8,8 @@ jobs:
       permissions:
         contents: write
       runs-on: ubuntu-latest
+      outputs:
+        files_changed: ${{ steps.check_for_changes.outputs.files_changed }}
       steps:
         - name: Checkout Repo
           uses: actions/checkout@v4
@@ -22,6 +24,7 @@ jobs:
             --url https://cwiki.apache.org/confluence/display/FLINK/Flink+Improvement+Proposals \
             --output-dir /output/someip-xyz --prefix FLIP 
         - name: Check if any files have changed and commit them
+          id: check_for_changes
           run: |
             git config --global user.name "${{ github.actor }}"
             git config --global user.email  "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
@@ -34,15 +37,12 @@ jobs:
             else
               echo "files_changed=false" >> $GITHUB_OUTPUT
             fi
-
-#    upload-artifacts:
-#      needs: [ generate-kip-redirects, generate-flip-redirects ]
-#      if: needs.generate-kip-redirects.outputs.files_changed == 'true' || needs.generate-flip-redirects.outputs.files_changed == 'true'
-#      runs-on: ubuntu-latest
-#      steps:
-#      - name: Deploy assets to Cloudflare
-#        uses: cloudflare/wrangler-action@v3
-#        with:
-#          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-#          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-#          command: pages deploy someip-xyz --project-name=someip-xyz
+            
+    upload-artifacts:
+      secrets: inherit
+      needs: generate-redirects
+      if: needs.generate-redirects.outputs.files_changed == 'true' 
+      uses: ./.github/workflows/upload_to_pages.yaml
+      with:
+        project: someip-xyz
+        assets_dir: someip-xyz
