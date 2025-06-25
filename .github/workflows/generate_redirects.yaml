@@ -15,12 +15,12 @@ jobs:
           uses: actions/checkout@v4
         - name: Generate KIP redirect files
           run: |
-            docker run --rm -v ${{ github.workspace }}:/output/ ghcr.io/surdy/proposal-parser:0.0.7 \
+            docker run --rm -v ${{ github.workspace }}:/output/ ghcr.io/surdy/proposal-parser:0.0.8 \
             --url https://cwiki.apache.org/confluence/display/kafka/kafka+improvement+proposals \
             --output-dir /output/someip-xyz
         - name: Generate FLIP redirect files
           run: |
-            docker run --rm -v ${{ github.workspace }}:/output/ ghcr.io/surdy/proposal-parser:0.0.7 \
+            docker run --rm -v ${{ github.workspace }}:/output/ ghcr.io/surdy/proposal-parser:0.0.8 \
             --url https://cwiki.apache.org/confluence/display/FLINK/Flink+Improvement+Proposals \
             --output-dir /output/someip-xyz
         - name: Check if any files have changed and commit them
