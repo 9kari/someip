@@ -81,11 +81,18 @@ def main():
         os.makedirs(dir_path, exist_ok=True)
         index_filepath = os.path.join(dir_path, "index.html")
         html_content = f"""<!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="refresh" content="0; url={proposal_url}" />
-    <title>Redirecting to {proposal_prefix}-{proposal_number}</title>
-  </head>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="refresh" content="0; url={proposal_url}" />
+        <script type="text/javascript">
+            window.location.href = "{proposal_url}"
+        </script>
+        <title>Redirecting to {proposal_prefix}-{proposal_number}</title>
+    </head>
+    <body>
+        If you are not redirected automatically, follow this <a href='{proposal_url}'>link</a>.
+    </body>
 </html>
 """
         with open(index_filepath, "w", encoding="utf-8") as f:
